@@ -6,7 +6,7 @@ def mailer():
     sender_email = "abhiccv1998@gmail.com"
     receiver_email = "abhiccv1998@gmail.com"
     # password = getpass.getpass()
-    password = "houseofdead"
+    password = "***********"
 
     message = MIMEMultipart("alternative")
     message["Subject"] = "Job 3 Build Failed"
@@ -21,7 +21,7 @@ def mailer():
         <html>
           <body>
             <p>Hi,<br>
-               There was a problem is in build : <b></b>
+               There was a problem in the code : <b></b>
                <br>
             </p>
           </body>
