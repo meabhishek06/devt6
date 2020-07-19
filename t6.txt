@@ -1,5 +1,5 @@
-job("j-job1"){
-        description("this job will copy the file in you os version and push image to docker hub")
+job("job1"){
+        
         scm {
                  github('meabhishek06/devt6' , 'master')
              }
@@ -9,70 +9,91 @@ job("j-job1"){
         }
 
         steps {
-        shell('''sudo cp  * /mnt
-sudo scp /mnt/* root@192.168.99.106:/devt6
-sudo ssh root@192.168.99.106 docker build -t aroraabhishek/devt6:latest  /devt6
-sudo ssh root@192.168.99.106 docker push aroraabhishek/devt6''')
+        shell('''sudo cp * /var/jenkins_home
+sudo scp /var/jenkins_home/* root@192.168.99.106:/devt6
+if sudo ls  /var/jenkins_home/ | grep .html
+	then
+	if sudo ssh root@192.168.99.106 kubectl get deploy | grep html
+		then
+		echo "already running"
+		else
+		sudo ssh root@192.168.99.106 kubectl create -f /devt6/html.yml
+	fi
+fi
+if sudo ls  /var/jenkins_home/ | grep .php
+	then
+	if sudo ssh root@192.168.99.106 kubectl get deploy | grep php
+		then
+		echo "already running"
+		else
+		sudo ssh root@192.168.99.106 kubectl create -f /devt6/php.yml
+fi 	
+fi
+
+sleep 20
+''')
       }
 }
 
 
-job("j-job2"){
-        description("this will create deployment for website and expose deployment")
+job("job2"){
         
         triggers {
         upstream {
-    upstreamProjects("j-job1")
+    upstreamProjects("job1")
     threshold("Fail")
         }
         }
 
         steps {
-        shell('''if sudo ssh root@192.168.99.106 kubectl get deployment | grep myweb
+        shell('''if sudo ls  /var/jenkins_home/ | grep .html
 then
-echo " updating"
-else
-sudo ssh root@192.168.99.106 kubectl create deployment myweb --image=aroraabhishek/devt6
-#sudo kubectl autoscale deployment myweb --min=10 --max=15 --cpu-#percent=80
+sudo ssh root@192.168.99.106 kubectl cp /devt3/*.html html-app-76744d58b7-kjjd6:/var/www/html/index.html 
 fi
-if sudo ssh root@192.168.99.106 kubectl get deployment -o wide | grep latest
-then 
-sudo ssh root@192.168.99.106 kubectl set image deployment myweb devt6=aroraabhishek/devt6
-else
-sudo ssh root@192.168.99.106 kubectl set image deployment myweb devt6=aroraabhishek/devt6:latest
-fi
-if sudo ssh root@192.168.99.106 kubectl get service | grep myweb
-then 
-echo "service exist"
-else
-sudo ssh root@192.168.99.106 kubectl expose deployment myweb --port=80 --type=NodePort
+if  sudo ls  /var/jenkins_home/ | grep .php
+then
+sudo ssh root@192.168.99.106 kubectl cp /devt3/*.php html-app-76744d58b7-kjjd6:/var/www/html/index.php 
 fi ''')
       }
 }
 
 
-job("j-job3") {
-  description ("It will test if pod is running else send a mail")
+job("job3") {
   
   triggers {
-    upstream('j-job2', 'SUCCESS')
+    upstream('job2', 'SUCCESS')
   }
   steps {
-    shell('''if sudo ssh root@192.168.99.106 kubectl get deployment | grep myweb
+    shell('''if sudo ls  /var/jenkins_home/ | grep .html
 then
-echo "send to production ALL OK"
-else
-echo "sending back to developer Some Error is there"
-sudo ssh root@192.168.99.106 python3 /devt6/mailer.py
+hstatus=$(curl -o /dev/null -s -w "%{http_code}" 192.168.99.100:31000)
+ if [[ $hstatus == 200 ]]
+  then 
+  echo "ALL OK"
+  else
+  echo "Some Error Occured"
+  sudo ssh 192.168.99.106 python3 /devt6/hmailer.py
+ fi
+fi
+if sudo ls  /var/jenkins_home/ | grep .php
+then
+pstatus=$(curl -o /dev/null -s -w "%{http_code}" 192.168.99.100:32000)
+ if [[ $pstatus == 200 ]]
+  then 
+  echo "ALL OK"
+  else
+  echo "Some Error Occured"
+  sudo ssh 192.168.99.106 python3 /devt6/pmailer.py
+ fi
 fi''')
   }
   
-buildPipelineView('j-jobs-view') {
+buildPipelineView('jobs-view') {
   filterBuildQueue(true)
   filterExecutors(false)
-  title('j-jobs-view')
+  title('jobs-view')
   displayedBuilds(1)
-  selectedJob('j-job1')
+  selectedJob('job1')
   alwaysAllowManualTrigger(false)
   showPipelineParameters(true)
   refreshFrequency(1)

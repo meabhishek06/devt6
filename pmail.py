@@ -6,22 +6,22 @@ def mailer():
     sender_email = "abhiccv1998@gmail.com"
     receiver_email = "abhiccv1998@gmail.com"
     # password = getpass.getpass()
-    password = "***********"
+    password = "houseofdead"
 
     message = MIMEMultipart("alternative")
-    message["Subject"] = "Job 3 Build Failed"
+    message["Subject"] = "PHP code has some error"
     message["From"] = sender_email
     message["To"] = receiver_email
     
     try:
         text = """\
-        The production environment failed to start, due to some error in the code base
+       PHP code uploaded has some error
         """
         html = """\
         <html>
           <body>
             <p>Hi,<br>
-               There was a problem in the code : <b></b>
+               There was a problem in code: <b></b>
                <br>
             </p>
           </body>
