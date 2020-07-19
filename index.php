@@ -5,6 +5,8 @@
 
 echo "welcome to abhi web server for testing
 
+error aayega
+
 
 echo `ifconfig`;
 

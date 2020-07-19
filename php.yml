@@ -62,7 +62,7 @@ spec:
     spec:
       containers:
       - name: php-con
-        image: aroraabhisek/php:v1
+        image: aroraabhishek/php:v1
         volumeMounts:
         - name: phplogs
           mountPath: /var/log/httpd/
