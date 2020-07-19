@@ -30,7 +30,7 @@ if sudo ls  /var/jenkins_home/ | grep .php
 fi 	
 fi
 
-sleep 20
+sleep 30
 ''')
       }
 }
@@ -48,11 +48,11 @@ job("job2"){
         steps {
         shell('''if sudo ls  /var/jenkins_home/ | grep .html
 then
-sudo ssh root@192.168.99.106 kubectl cp /devt3/*.html html-app-76744d58b7-kjjd6:/var/www/html/index.html 
+sudo ssh root@192.168.99.106 kubectl cp /devt6/*.html html-app-76744d58b7-kjjd6:/var/www/html/index.html 
 fi
 if  sudo ls  /var/jenkins_home/ | grep .php
 then
-sudo ssh root@192.168.99.106 kubectl cp /devt3/*.php html-app-76744d58b7-kjjd6:/var/www/html/index.php 
+sudo ssh root@192.168.99.106 kubectl cp /devt6/*.php html-app-76744d58b7-kjjd6:/var/www/html/index.php 
 fi ''')
       }
 }
